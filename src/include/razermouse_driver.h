@@ -79,6 +79,8 @@
 #define USB_DEVICE_ID_RAZER_OROCHI_V2_RECEIVER 0x0094
 #define USB_DEVICE_ID_RAZER_OROCHI_V2 0x0095
 #define USB_DEVICE_ID_RAZER_OROCHI_V2_BLUETOOTH 0x0095
+#define USB_DEVICE_ID_RAZER_BASILISK_V3_PRO 0x00aa
+#define USB_DEVICE_ID_RAZER_BASILISK_V3_PRO_RECEIVER 0x00ab
 
 /* Each keyboard report has 90 bytes*/
 #define RAZER_REPORT_LEN 0x5A
@@ -98,6 +100,7 @@
 
 #define RAZER_VIPER_MOUSE_RECEIVER_WAIT_MIN_US 59900
 #define RAZER_VIPER_MOUSE_RECEIVER_WAIT_MAX_US 60000
+
 
 // struct razer_mouse_device {
 //     IOUSBDeviceInterface **usbdev;
@@ -208,5 +211,7 @@ ssize_t razer_attr_write_logo_led_rgb(IOUSBDeviceInterface **usb_dev, const char
 
 ssize_t razer_attr_read_get_battery(IOUSBDeviceInterface **usb_dev, char *buf);
 ssize_t razer_attr_read_is_charging(IOUSBDeviceInterface **usb_dev, char *buf);
+ssize_t razer_attr_read_device_serial(IOUSBDeviceInterface **usb_dev,
+                                             char *buf);
 
 #endif

@@ -16,14 +16,14 @@
  */
 IOReturn razer_send_control_msg(IOUSBDeviceInterface **dev, void const *data, uint report_index) {
     IOUSBDevRequest request;
-    
+
     request.bRequest = HID_REQ_SET_REPORT; // 0x09
     request.bmRequestType = USB_TYPE_CLASS | USB_RECIP_INTERFACE | USB_DIR_OUT;
     request.wValue = 0x300;
     request.wIndex = report_index;
     request.wLength = RAZER_USB_REPORT_LEN;
     request.pData = (void*)data;
-    
+
     return (*dev)->DeviceRequest(dev, &request);
 }
 
@@ -48,39 +48,39 @@ IOReturn razer_send_control_msg(IOUSBDeviceInterface **dev, void const *data, ui
 IOReturn razer_get_usb_response(IOUSBDeviceInterface **dev, uint report_index, struct razer_report* request_report, uint response_index, struct razer_report* response_report, int wait_us) {
     IOReturn retval;
     char buffer[sizeof(struct razer_report)];
-    
+
     // Send the request to the device.
     // TODO look to see if index needs to be different for the request and the response
     retval = razer_send_control_msg(dev, request_report, report_index);
-    
+
     if(retval != kIOReturnSuccess) {
         printf("razer_send_control_msg failed!\n");
-        
+
         return retval;
     }
 
     usleep(wait_us);
-    
+
     IOUSBDevRequest request;
-    
+
     request.bRequest = HID_REQ_GET_REPORT;
     request.bmRequestType = USB_TYPE_CLASS | USB_RECIP_INTERFACE | USB_DIR_IN;
     request.wValue = 0x300;
     request.wIndex = report_index;
     request.wLength = RAZER_USB_REPORT_LEN;
     request.pData = buffer;
-    
+
     retval = (*dev)->DeviceRequest(dev, &request);
-    
+
     if(retval != kIOReturnSuccess) {
         printf("razer_get_usb_response failed\n");
-        
+
         return retval;
     }
-    
+
     memcpy(response_report, buffer, sizeof(struct razer_report));
-    
-    
+
+
     return retval;
 }
 
@@ -90,7 +90,7 @@ IOReturn razer_get_usb_response(IOUSBDeviceInterface **dev, uint report_index, s
  */
 struct razer_report get_razer_report(unsigned char command_class, unsigned char command_id, unsigned char data_size) {
     struct razer_report new_report = get_empty_razer_report();
-    
+
     new_report.status = 0x00;
     new_report.transaction_id.id = 0xFF;
     new_report.remaining_packets = 0x00;
@@ -98,7 +98,7 @@ struct razer_report get_razer_report(unsigned char command_class, unsigned char 
     new_report.command_class = command_class;
     new_report.command_id.id = command_id;
     new_report.data_size = data_size;
-    
+
     return new_report;
 }
 
@@ -127,13 +127,13 @@ unsigned char razer_calculate_crc(struct razer_report *report)
     /*just xor all bytes up with overflow and you are done*/
     unsigned char crc = 0;
     unsigned char *_report = (unsigned char*)report;
-    
+
     unsigned int i;
     for(i = 2; i < 88; i++)
     {
         crc ^= _report[i];
     }
-    
+
     return crc;
 }
 
