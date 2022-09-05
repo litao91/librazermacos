@@ -184,6 +184,8 @@ ssize_t razer_attr_write_right_mode_reactive(IOUSBDeviceInterface **usb_dev, con
 ushort razer_attr_read_dpi(IOUSBDeviceInterface **usb_dev);
 void razer_attr_write_dpi(IOUSBDeviceInterface **usb_dev, ushort dpi_x, ushort dpi_y);
 
+ushort razer_attr_read_dpi_stages(IOUSBDeviceInterface **usb_dev, char* buf);
+
 // Poll
 ushort razer_attr_read_poll_rate(IOUSBDeviceInterface **usb_dev);
 void razer_attr_write_poll_rate(IOUSBDeviceInterface **usb_dev, ushort polling_rate);

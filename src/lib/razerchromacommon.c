@@ -1065,6 +1065,17 @@ struct razer_report razer_chroma_misc_set_dock_brightness(unsigned char brightne
 }
 
 /**
+ * Get the DPI stages of the device
+ */
+struct razer_report razer_chroma_misc_get_dpi_stages(unsigned char variable_storage)
+{
+    struct razer_report report = get_razer_report(0x04, 0x86, 0x26);
+
+    report.arguments[0] = variable_storage;
+
+    return report;
+}
+/**
  * Set the DPI of the device
  */
 struct razer_report razer_chroma_misc_set_dpi_xy(unsigned char variable_storage, unsigned short dpi_x,unsigned short dpi_y)

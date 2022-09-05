@@ -1791,7 +1791,7 @@ ssize_t razer_attr_write_right_mode_reactive(IOUSBDeviceInterface **usb_dev,
 }
 
 ushort razer_attr_read_dpi(IOUSBDeviceInterface **usb_dev) {
-  struct razer_report report;
+  struct razer_report report = {0};
   struct razer_report response = {0};
   UInt16 product = -1;
   (*usb_dev)->GetDeviceProduct(usb_dev, &product);
@@ -1814,6 +1814,63 @@ ushort razer_attr_read_dpi(IOUSBDeviceInterface **usb_dev) {
                          // somehow can equal FFFFFF80????
   ushort dpi_y = (response.arguments[3] << 8) | (response.arguments[4] & 0xFF);
   return dpi_x;
+}
+
+ushort razer_attr_read_dpi_stages(IOUSBDeviceInterface **usb_dev, char *buf) {
+  struct razer_report report = {0};
+  struct razer_report response = {0};
+  UInt16 product = -1;
+  (*usb_dev)->GetDeviceProduct(usb_dev, &product);
+
+  unsigned char stages_count;
+  ssize_t count;       // bytes written
+  unsigned int i;      // iterator over stages_count
+  unsigned char *args; // pointer to the next dpi value in response.arguments
+
+  report = razer_chroma_misc_get_dpi_stages(VARSTORE);
+  switch (product) {
+  case USB_DEVICE_ID_RAZER_BASILISK_V3_PRO_RECEIVER:
+    report.transaction_id.id = 0x1f;
+    break;
+  }
+  response = razer_send_payload(usb_dev, &report);
+
+  // Response format (hex):
+  // 01    varstore
+  // 02    active DPI stage
+  // 04    number of stages = 4
+  //
+  // 01    first DPI stage
+  // 03 20 first stage DPI X = 800
+  // 03 20 first stage DPI Y = 800
+  // 00 00 reserved
+  //
+  // 02    second DPI stage
+  // 07 08 second stage DPI X = 1800
+  // 07 08 second stage DPI Y = 1800
+  // 00 00 reserved
+  //
+  // 03    third DPI stage
+  // ...
+
+  stages_count = response.arguments[2];
+
+  buf[0] = response.arguments[1];
+
+  count = 1;
+  args = response.arguments + 4;
+  for (i = 0; i < stages_count; i++) {
+    // Check that we don't read past response.data_size
+    if (args + 4 > response.arguments + response.data_size) {
+      break;
+    }
+
+    memcpy(buf + count, args, 4);
+    count += 4;
+    args += 7;
+  }
+
+  return count;
 }
 
 void razer_attr_write_dpi(IOUSBDeviceInterface **usb_dev, ushort dpi_x,
