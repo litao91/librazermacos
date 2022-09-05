@@ -20,8 +20,8 @@ int main(int argc, const char *argv[]) {
       char *buf = malloc(sizeof(char) * 256);
       razer_attr_read_device_serial(device.usbDevice, buf);
       printf("serial: %s\n", buf);
-      razer_attr_read_get_battery(device.usbDevice, buf);
-      printf("battery: %s\n", buf);
+      ushort battery_level = razer_attr_read_get_battery(device.usbDevice);
+      printf("battery: %d -- %d\n", battery_level, battery_level * 100 / 255);
       razer_attr_read_is_charging(device.usbDevice, buf);
       printf("is charging: %s\n", buf);
       ushort poll_rate = razer_attr_read_poll_rate(device.usbDevice);

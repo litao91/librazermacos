@@ -1879,7 +1879,7 @@ void razer_attr_write_dpi(IOUSBDeviceInterface **usb_dev, ushort dpi_x,
   razer_send_payload(usb_dev, &report);
 }
 
-ssize_t razer_attr_read_get_battery(IOUSBDeviceInterface **usb_dev, char *buf) {
+ushort razer_attr_read_get_battery(IOUSBDeviceInterface **usb_dev) {
   struct razer_report report = razer_chroma_misc_get_battery_level();
   struct razer_report response_report = {0};
   UInt16 product = -1;
@@ -1907,7 +1907,7 @@ ssize_t razer_attr_read_get_battery(IOUSBDeviceInterface **usb_dev, char *buf) {
   }
   response_report = razer_send_payload(usb_dev, &report);
 
-  return sprintf(buf, "%d\n", response_report.arguments[1]);
+  return response_report.arguments[1];
 }
 
 /**

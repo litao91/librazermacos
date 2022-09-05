@@ -211,7 +211,7 @@ ssize_t razer_attr_write_logo_led_effect(IOUSBDeviceInterface **usb_dev, const c
 ssize_t razer_attr_write_scroll_led_effect(IOUSBDeviceInterface **usb_dev, const char *buf, size_t count);
 ssize_t razer_attr_write_logo_led_rgb(IOUSBDeviceInterface **usb_dev, const char *buf, size_t count);
 
-ssize_t razer_attr_read_get_battery(IOUSBDeviceInterface **usb_dev, char *buf);
+ushort razer_attr_read_get_battery(IOUSBDeviceInterface **usb_dev);
 ssize_t razer_attr_read_is_charging(IOUSBDeviceInterface **usb_dev, char *buf);
 ssize_t razer_attr_read_device_serial(IOUSBDeviceInterface **usb_dev,
                                              char *buf);
