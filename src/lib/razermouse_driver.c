@@ -90,6 +90,7 @@ static int razer_get_report(IOUSBDeviceInterface **usb_dev,
                                   RAZER_NEW_MOUSE_RECEIVER_WAIT_MIN_US);
     break;
   case USB_DEVICE_ID_RAZER_BASILISK_V3_PRO_RECEIVER:
+  case USB_DEVICE_ID_RAZER_BASILISK_V3_PRO_WIRED:
     return razer_get_usb_response(usb_dev, index, request_report, index,
                                   response_report,
                                   RAZER_NEW_MOUSE_RECEIVER_WAIT_MAX_US);
@@ -1798,6 +1799,7 @@ ushort razer_attr_read_dpi(IOUSBDeviceInterface **usb_dev) {
 
   switch (product) {
   case USB_DEVICE_ID_RAZER_BASILISK_V3_PRO_RECEIVER:
+  case USB_DEVICE_ID_RAZER_BASILISK_V3_PRO_WIRED:
     report = razer_chroma_misc_get_dpi_xy(NOSTORE);
     report.transaction_id.id = 0x1f;
     break;
@@ -1830,6 +1832,7 @@ ushort razer_attr_read_dpi_stages(IOUSBDeviceInterface **usb_dev, char *buf) {
   report = razer_chroma_misc_get_dpi_stages(VARSTORE);
   switch (product) {
   case USB_DEVICE_ID_RAZER_BASILISK_V3_PRO_RECEIVER:
+  case USB_DEVICE_ID_RAZER_BASILISK_V3_PRO_WIRED:
     report.transaction_id.id = 0x1f;
     break;
   }
@@ -1902,6 +1905,7 @@ ushort razer_attr_read_get_battery(IOUSBDeviceInterface **usb_dev) {
   case USB_DEVICE_ID_RAZER_OROCHI_V2_RECEIVER:
   case USB_DEVICE_ID_RAZER_OROCHI_V2_BLUETOOTH:
   case USB_DEVICE_ID_RAZER_BASILISK_V3_PRO_RECEIVER:
+  case USB_DEVICE_ID_RAZER_BASILISK_V3_PRO_WIRED:
     report.transaction_id.id = 0x1f;
     break;
   }
@@ -1927,7 +1931,6 @@ ssize_t razer_attr_read_is_charging(IOUSBDeviceInterface **usb_dev, char *buf) {
   case USB_DEVICE_ID_RAZER_ATHERIS_RECEIVER:
   case USB_DEVICE_ID_RAZER_OROCHI_V2_RECEIVER:
   case USB_DEVICE_ID_RAZER_OROCHI_V2_BLUETOOTH:
-  case USB_DEVICE_ID_RAZER_BASILISK_V3_PRO_RECEIVER:
     return sprintf(buf, "0\n");
     break;
 
@@ -1943,6 +1946,8 @@ ssize_t razer_attr_read_is_charging(IOUSBDeviceInterface **usb_dev, char *buf) {
   case USB_DEVICE_ID_RAZER_BASILISK_ULTIMATE:
   case USB_DEVICE_ID_RAZER_LANCEHEAD_WIRELESS_RECEIVER:
   case USB_DEVICE_ID_RAZER_LANCEHEAD_WIRELESS_WIRED:
+  case USB_DEVICE_ID_RAZER_BASILISK_V3_PRO_RECEIVER:
+  case USB_DEVICE_ID_RAZER_BASILISK_V3_PRO_WIRED:
     report.transaction_id.id = 0x1f;
     break;
   }
@@ -1995,6 +2000,7 @@ ushort razer_attr_read_poll_rate(IOUSBDeviceInterface **usb_dev) {
   case USB_DEVICE_ID_RAZER_DEATHADDER_V2_PRO_WIRELESS:
   case USB_DEVICE_ID_RAZER_DEATHADDER_V2_MINI:
   case USB_DEVICE_ID_RAZER_BASILISK_V3_PRO_RECEIVER:
+  case USB_DEVICE_ID_RAZER_BASILISK_V3_PRO_WIRED:
     report.transaction_id.id = 0x3f;
     break;
 
@@ -2606,6 +2612,7 @@ ssize_t razer_attr_read_device_serial(IOUSBDeviceInterface **usb_dev,
   case USB_DEVICE_ID_RAZER_OROCHI_V2_BLUETOOTH:
   case USB_DEVICE_ID_RAZER_BASILISK_V3:
   case USB_DEVICE_ID_RAZER_BASILISK_V3_PRO_RECEIVER:
+  case USB_DEVICE_ID_RAZER_BASILISK_V3_PRO_WIRED:
     report.transaction_id.id = 0x1f;
     break;
   }
