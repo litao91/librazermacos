@@ -1,6 +1,7 @@
-#include<stdio.h>
 #include "razerdevice.h"
 #include "razermouse_driver.h"
+#include <stdio.h>
+#include <string.h>
 
 int main(int argc, const char *argv[]) {
   RazerDevices allDevices = getAllRazerDevices();
@@ -13,7 +14,8 @@ int main(int argc, const char *argv[]) {
     printf("%#06x\n", device.productId);
 
     // Testing out the blackwidow v3 pro changes by switching to wave
-    if (device.productId == USB_DEVICE_ID_RAZER_BASILISK_V3_PRO_RECEIVER || device.productId == USB_DEVICE_ID_RAZER_BASILISK_V3_PRO_WIRED) {
+    if (device.productId == USB_DEVICE_ID_RAZER_BASILISK_V3_PRO_RECEIVER ||
+        device.productId == USB_DEVICE_ID_RAZER_BASILISK_V3_PRO_WIRED) {
       /* printf("Found blackwidow v3 pro keyboard (wired)\n"); */
       /* razer_attr_write_mode_wave(device.usbDevice, "1", 0, 0x90); */
       printf("FOUND basilisk_v3 pro receiver\n");
@@ -37,6 +39,15 @@ int main(int argc, const char *argv[]) {
         printf("%d: %d, %d\n", i, dpi_x, dpi_y);
       }
       free(buf);
+
+      printf("Writing dpi: \n");
+      razer_attr_write_dpi(device.usbDevice, 10000, 10000);
+      /* printf("Writing dpi stages\n"); */
+      /* unsigned short dpis[] = {1000, 1000, 2000, 2000, 5000, 5000, 10000, 10000, 20000, 20000}; */
+      /* char bbuf[13]; */
+      /* bbuf[0] = 5; */
+      /* memcpy(buf+1, dpis, sizeof(short) * 10); */
+      /* razer_attr_write_dpi_stages(device.usbDevice, bbuf, 5*4); */
     }
   }
 

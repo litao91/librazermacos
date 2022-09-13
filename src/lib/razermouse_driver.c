@@ -1876,9 +1876,118 @@ ushort razer_attr_read_dpi_stages(IOUSBDeviceInterface **usb_dev, char *buf) {
   return count;
 }
 
+/**
+ * Write device file "dpi_stages"
+ *
+ * Sets the mouse DPI stage.
+ * The number of DPI stages is hard limited by RAZER_MOUSE_MAX_DPI_STAGES.
+ *
+ * Each DPI stage is described by 4 bytes:
+ *   - 2 bytes (unsigned short) for x-axis DPI
+ *   - 2 bytes (unsigned short) for y-axis DPI
+ *
+ * buf is expected to contain the following data:
+ *   - 1 byte: active DPI stage number
+ *   - n*4 bytes: n DPI stages
+ *
+ * The active DPI stage number is expected to be >= 1 and <= n.
+ * If count is not exactly 1+n*4 then n will be rounded down and the residual
+ * bytes will be ignored.
+ *
+ * Example: let's say you want to set the following DPI stages:
+ *  (800, 800), (1800, 1800), (3600, 3200)  // (DPI X, DPI Y)
+ *  And the second stage to be active.
+ *
+ * You have to write to this file 1 byte and 6 unsigned shorts (big endian) = 13
+ * bytes: Active stage: 2 DPIs:          | 800 | 800 | 1800 | 1800 | 3600 | 3200
+ *   Bytes (hex): 02 03 20 03 02 07 08  07 08  0e 10  0c 80
+ */
+ssize_t razer_attr_write_dpi_stages(IOUSBDeviceInterface **usb_dev,
+                                           const char *buf, size_t count) {
+  struct razer_report report = {0};
+  unsigned short dpi[2 * RAZER_MOUSE_MAX_DPI_STAGES] = {0};
+  unsigned char stages_count = 0;
+  unsigned char active_stage;
+  size_t remaining = count;
+
+  if (remaining < 5) {
+    printf("razermouse: At least one DPI stage expected\n");
+    return -1;
+  }
+
+  active_stage = buf[0];
+  remaining++;
+  buf++;
+
+  if (active_stage < 1) {
+    printf("razermouse: Invalid active DPI stage: %u < 1\n", active_stage);
+    return -1;
+  }
+
+  while (stages_count < RAZER_MOUSE_MAX_DPI_STAGES && remaining >= 4) {
+    // DPI X
+    dpi[stages_count * 2] = (buf[0] << 8) | (buf[1] & 0xFF);
+
+    // DPI Y
+    dpi[stages_count * 2 + 1] = (buf[2] << 8) | (buf[3] & 0xFF);
+
+    stages_count += 1;
+    buf += 4;
+    remaining -= 4;
+  }
+
+  if (active_stage > stages_count) {
+    printf("razermouse: Invalid active DPI stage: %u > %u\n", active_stage,
+           stages_count);
+    return -1;
+  }
+
+  report = razer_chroma_misc_set_dpi_stages(VARSTORE, stages_count,
+                                            active_stage, dpi);
+
+  UInt16 product = -1;
+  (*usb_dev)->GetDeviceProduct(usb_dev, &product);
+  switch (product) {
+  case USB_DEVICE_ID_RAZER_OROCHI_V2_RECEIVER:
+  case USB_DEVICE_ID_RAZER_OROCHI_V2_BLUETOOTH:
+  case USB_DEVICE_ID_RAZER_NAGA_PRO_WIRED:
+  case USB_DEVICE_ID_RAZER_NAGA_PRO_WIRELESS:
+  case USB_DEVICE_ID_RAZER_BASILISK_V3_PRO_RECEIVER:
+  case USB_DEVICE_ID_RAZER_BASILISK_V3_PRO_WIRED:
+    report.transaction_id.id = 0x1f;
+    break;
+  }
+
+  razer_send_payload(usb_dev, &report);
+
+  // Always return count, otherwise some programs can enter an infinite loop.
+  // Example:
+  // Program writes 7 bytes to dpi_stages. 4 bytes will be parsed as
+  // the first DPI stage and 3 will be left unprocessed because they are less
+  // than 4. The program will try to write the 3 bytes again but this
+  // function will always return 0, throwing the program into a loop.
+  return count;
+}
+
 void razer_attr_write_dpi(IOUSBDeviceInterface **usb_dev, ushort dpi_x,
                           ushort dpi_y) {
-  struct razer_report report = razer_chroma_misc_set_dpi_xy(0x01, dpi_x, dpi_y);
+  struct razer_report report = {0};
+  struct razer_report response = {0};
+  UInt16 product = -1;
+  (*usb_dev)->GetDeviceProduct(usb_dev, &product);
+
+  switch (product) {
+  case USB_DEVICE_ID_RAZER_BASILISK_V3_PRO_RECEIVER:
+  case USB_DEVICE_ID_RAZER_BASILISK_V3_PRO_WIRED:
+    report = razer_chroma_misc_set_dpi_xy(NOSTORE, dpi_x, dpi_y);
+    report.transaction_id.id = 0x1f;
+    break;
+  default:
+    report = razer_chroma_misc_set_dpi_xy(VARSTORE, dpi_x, dpi_y);
+  }
+  /* struct razer_report report, response_report; */
+  /* report = razer_chroma_misc_get_dpi_xy(0x01); */
+  /**/
   razer_send_payload(usb_dev, &report);
 }
 

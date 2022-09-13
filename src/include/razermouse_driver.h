@@ -101,6 +101,7 @@
 #define RAZER_VIPER_MOUSE_RECEIVER_WAIT_MIN_US 59900
 #define RAZER_VIPER_MOUSE_RECEIVER_WAIT_MAX_US 60000
 
+#define RAZER_MOUSE_MAX_DPI_STAGES 5
 
 // struct razer_mouse_device {
 //     IOUSBDeviceInterface **usbdev;
@@ -185,6 +186,8 @@ ushort razer_attr_read_dpi(IOUSBDeviceInterface **usb_dev);
 void razer_attr_write_dpi(IOUSBDeviceInterface **usb_dev, ushort dpi_x, ushort dpi_y);
 
 ushort razer_attr_read_dpi_stages(IOUSBDeviceInterface **usb_dev, char* buf);
+ssize_t razer_attr_write_dpi_stages(IOUSBDeviceInterface **usb_dev,
+                                           const char *buf, size_t count);
 
 // Poll
 ushort razer_attr_read_poll_rate(IOUSBDeviceInterface **usb_dev);
