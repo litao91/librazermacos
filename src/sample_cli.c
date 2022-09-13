@@ -44,8 +44,8 @@ int main(int argc, const char *argv[]) {
       /* razer_attr_write_dpi(device.usbDevice, 10000, 10000); */
 
       /* printf("Writing dpi stages\n"); */
-      /* unsigned short dpis[] = {1000, 1000, 4000, 4000, 8000, 8000, 10000, 10000, 20000, 20000}; */
-      /* razer_attr_write_dpi_stages_simple(device.usbDevice, 5, 5, dpis); */
+      /* unsigned short dpis[] = {1000, 1000, 4000, 4000, 6000, 6000, 10000, 10000, 20000, 20000}; */
+      /* razer_attr_write_dpi_stages_simple(device.usbDevice, 5, 3, dpis); */
     }
   }
 
