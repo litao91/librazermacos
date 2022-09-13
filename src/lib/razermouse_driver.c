@@ -1829,6 +1829,7 @@ ushort razer_attr_read_dpi_stages(IOUSBDeviceInterface **usb_dev, char *buf) {
   unsigned int i;      // iterator over stages_count
   unsigned char *args; // pointer to the next dpi value in response.arguments
 
+  // 0x02 for another
   report = razer_chroma_misc_get_dpi_stages(VARSTORE);
   switch (product) {
   case USB_DEVICE_ID_RAZER_BASILISK_V3_PRO_RECEIVER:
@@ -1903,7 +1904,7 @@ ushort razer_attr_read_dpi_stages(IOUSBDeviceInterface **usb_dev, char *buf) {
  *   Bytes (hex): 02 03 20 03 02 07 08  07 08  0e 10  0c 80
  */
 ssize_t razer_attr_write_dpi_stages(IOUSBDeviceInterface **usb_dev,
-                                           const char *buf, size_t count) {
+                                    const char *buf, size_t count) {
   struct razer_report report = {0};
   unsigned short dpi[2 * RAZER_MOUSE_MAX_DPI_STAGES] = {0};
   unsigned char stages_count = 0;
@@ -1926,10 +1927,10 @@ ssize_t razer_attr_write_dpi_stages(IOUSBDeviceInterface **usb_dev,
 
   while (stages_count < RAZER_MOUSE_MAX_DPI_STAGES && remaining >= 4) {
     // DPI X
-    dpi[stages_count * 2] = (buf[0] << 8) | (buf[1] & 0xFF);
+    dpi[stages_count * 2] = (buf[1] << 8) | (buf[0] & 0xFF);
 
     // DPI Y
-    dpi[stages_count * 2 + 1] = (buf[2] << 8) | (buf[3] & 0xFF);
+    dpi[stages_count * 2 + 1] = (buf[3] << 8) | (buf[2] & 0xFF);
 
     stages_count += 1;
     buf += 4;
@@ -1967,6 +1968,31 @@ ssize_t razer_attr_write_dpi_stages(IOUSBDeviceInterface **usb_dev,
   // than 4. The program will try to write the 3 bytes again but this
   // function will always return 0, throwing the program into a loop.
   return count;
+}
+
+ssize_t razer_attr_write_dpi_stages_simple(IOUSBDeviceInterface **usb_dev,
+                                           unsigned short stages_count,
+                                           unsigned short active_stage,
+                                           unsigned short *dpi) {
+  struct razer_report report = {0};
+
+  report = razer_chroma_misc_set_dpi_stages(VARSTORE, stages_count,
+                                            active_stage, dpi);
+
+  UInt16 product = -1;
+  (*usb_dev)->GetDeviceProduct(usb_dev, &product);
+  switch (product) {
+  case USB_DEVICE_ID_RAZER_OROCHI_V2_RECEIVER:
+  case USB_DEVICE_ID_RAZER_OROCHI_V2_BLUETOOTH:
+  case USB_DEVICE_ID_RAZER_NAGA_PRO_WIRED:
+  case USB_DEVICE_ID_RAZER_NAGA_PRO_WIRELESS:
+  case USB_DEVICE_ID_RAZER_BASILISK_V3_PRO_RECEIVER:
+  case USB_DEVICE_ID_RAZER_BASILISK_V3_PRO_WIRED:
+    report.transaction_id.id = 0x1f;
+    break;
+  }
+
+  razer_send_payload(usb_dev, &report);
 }
 
 void razer_attr_write_dpi(IOUSBDeviceInterface **usb_dev, ushort dpi_x,

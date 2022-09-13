@@ -188,6 +188,10 @@ void razer_attr_write_dpi(IOUSBDeviceInterface **usb_dev, ushort dpi_x, ushort d
 ushort razer_attr_read_dpi_stages(IOUSBDeviceInterface **usb_dev, char* buf);
 ssize_t razer_attr_write_dpi_stages(IOUSBDeviceInterface **usb_dev,
                                            const char *buf, size_t count);
+ssize_t razer_attr_write_dpi_stages_simple(IOUSBDeviceInterface **usb_dev,
+                                           unsigned short stages_count,
+                                           unsigned short active_stage,
+                                           unsigned short *dpi);
 
 // Poll
 ushort razer_attr_read_poll_rate(IOUSBDeviceInterface **usb_dev);

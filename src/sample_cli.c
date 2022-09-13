@@ -40,14 +40,12 @@ int main(int argc, const char *argv[]) {
       }
       free(buf);
 
-      printf("Writing dpi: \n");
-      razer_attr_write_dpi(device.usbDevice, 10000, 10000);
+      /* printf("Writing dpi: \n"); */
+      /* razer_attr_write_dpi(device.usbDevice, 10000, 10000); */
+
       /* printf("Writing dpi stages\n"); */
-      /* unsigned short dpis[] = {1000, 1000, 2000, 2000, 5000, 5000, 10000, 10000, 20000, 20000}; */
-      /* char bbuf[13]; */
-      /* bbuf[0] = 5; */
-      /* memcpy(buf+1, dpis, sizeof(short) * 10); */
-      /* razer_attr_write_dpi_stages(device.usbDevice, bbuf, 5*4); */
+      /* unsigned short dpis[] = {1000, 1000, 4000, 4000, 8000, 8000, 10000, 10000, 20000, 20000}; */
+      /* razer_attr_write_dpi_stages_simple(device.usbDevice, 5, 5, dpis); */
     }
   }
 
